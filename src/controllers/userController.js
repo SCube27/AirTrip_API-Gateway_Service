@@ -7,7 +7,7 @@ const userService = new UserService(new UserRepository());
 
 async function signUp(req, res, next) {
     try {
-        const user = await userService.createUser({
+        const user = await userService.signupUser({
             username: req.body.username,
             email: req.body.email,
             password: req.body.password
@@ -24,6 +24,26 @@ async function signUp(req, res, next) {
     }
 }
 
+async function logIn(req, res, next) {
+    try {
+        const user = await userService.loginUser({
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password
+        });
+
+        return res.status(StatusCodes.CREATED).json({
+            success: true,
+            message: "User logged in",
+            error: {},
+            data: user
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     signUp,
+    logIn
 }
