@@ -66,10 +66,11 @@ class UserService {
                 Logger.error('Recieved JWT Token is not valid');
                 throw new BadRequestError('JWT Token', "JWT Token is invalid");
             }
-            if(error.name == 'BadRequest') {
-                throw error;
+            if(error.name == 'TokenExpiredError') {
+                Logger.error('Recieved JWT Token is expired');
+                throw new BadRequestError('JWT Token', "JWT Token expired");
             }
-            if(error.name == 'NotFound') {
+            if(error.name == 'BadRequest' || error.name == 'NotFound') {
                 throw error;
             }
             Logger.error("Some internal issue happened");
