@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { ServerConfig } = require('./config');
 const apiRouter = require('./routes');
 const errorHandler = require('./utils/errorHandler');
+const { Auth } = require('./utils/index');
 
 const app = express();
 

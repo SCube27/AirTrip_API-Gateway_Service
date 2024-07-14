@@ -1,4 +1,4 @@
-const { InternalServerError, BadRequestError } = require('../errors/index');
+const { InternalServerError, BadRequestError, NotFoundError } = require('../errors/index');
 const { Logger } = require('../config/index');
 const { Auth } = require('../utils/index');
 
@@ -36,14 +36,43 @@ class UserService {
             if(!passwordMatch) {
                 throw new BadRequestError('Password', "The entered password doesn't match");
             }
-            
+
             const jwt = Auth.createToken({id: user.id, username: user.username, email: user.email});
             return jwt;
         } catch (error) {
             if(error.name == 'BadRequest') {
                 throw error;
             }
-            Logger.error("Somthing internal issue happened can't login");
+            Logger.error("Some internal issue happened can't login");
+            throw new InternalServerError('Some internal server issue occured');
+        }
+    }
+
+    async isAuthenticated(token) {
+        try {
+            if(!token) {
+                throw new BadRequestError('JWT Token', "JWT Token is missing");
+            }
+            const response = Auth.verifyToken(token);
+
+            const user = await this.userRepository.get(response.id);
+            if(!user) {
+                Logger.error('User for the given ID not found');
+                throw new NotFoundError(user, 'User not found');
+            }
+            return user.id;
+        } catch (error) {
+            if(error.name == 'JsonWebTokenError') {
+                Logger.error('Recieved JWT Token is not valid');
+                throw new BadRequestError('JWT Token', "JWT Token is invalid");
+            }
+            if(error.name == 'BadRequest') {
+                throw error;
+            }
+            if(error.name == 'NotFound') {
+                throw error;
+            }
+            Logger.error("Some internal issue happened");
             throw new InternalServerError('Some internal server issue occured');
         }
     }
