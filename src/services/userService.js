@@ -80,6 +80,55 @@ class UserService {
             throw new InternalServerError('Some internal server issue occured');
         }
     }
+
+    async addRoletoUser(data) {
+        try {
+            const user = await this.userRepository.get(data.id);
+            if(!user) {
+                Logger.error('User for the given ID not found');
+                throw new NotFoundError(user, 'User not found');
+            }
+
+            const role = await this.roleRepository.getRolebyName(data.role);
+            if(!role) {
+                Logger.error('Role for the given name not found');
+                throw new NotFoundError(user, 'Role not found');
+            }
+
+            user.addRole(role);
+            return user;
+        } catch (error) {
+            if(error.name == 'NotFound') {
+                throw error;
+            }
+            Logger.error("Some internal issue happened");
+            throw new InternalServerError('Some internal server issue occured');
+        }
+    }
+
+    async isAdmin(id) {
+        try {
+            const user = await this.userRepository.get(id);
+            if(!user) {
+                Logger.error('User for the given ID not found');
+                throw new NotFoundError(user, 'User not found');
+            }
+
+            const adminRole = await this.roleRepository.getRolebyName(Enums.USER_ROLES.ADMIN);
+            if(!adminRole) {
+                Logger.error('User for given role not found');
+                throw new NotFoundError(user, 'Role not found');
+            }
+
+            return user.hasRole(adminRole);
+        } catch (error) {
+            if(error.name == 'NotFound') {
+                throw error;
+            }
+            Logger.error("Some internal issue happened");
+            throw new InternalServerError('Some internal server issue occured');
+        }
+    }
 }
 
 module.exports = UserService;

@@ -9,4 +9,6 @@ userRouter.post('/signup', AuthMiddleware.validateAuthRequest, UserController.si
 
 userRouter.post('/login', AuthMiddleware.validateAuthRequest, UserController.logIn);
 
+userRouter.post('/role', AuthMiddleware.checkAuth, AuthMiddleware.isAdmin, UserController.addRoletoUser);
+
 module.exports = userRouter;

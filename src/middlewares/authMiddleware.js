@@ -1,7 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 
 const { Logger } = require('../config/index');
-const { BadRequestError } = require('../errors/index');
+const { BadRequestError, UnauthorizedError } = require('../errors/index');
 const { UserService } = require('../services/index');
 const { UserRepository, RoleRepository } = require('../repositories/index');
 
@@ -58,7 +58,23 @@ async function checkAuth(req, res, next) {
     }
 }
 
+async function isAdmin(req, res, next) {
+    const response = await userService.isAdmin(req.user);
+
+    if(!response) {
+        Logger.error("User not authorized for this action");
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+            success: false,
+            message: 'User is not authorized to perform this action',
+            error: new UnauthorizedError("The user doesn't have admin role for performing this action"),
+            data: {}
+        });
+    }
+    next();
+}
+
 module.exports = {
     validateAuthRequest,
-    checkAuth
+    checkAuth,
+    isAdmin
 }
