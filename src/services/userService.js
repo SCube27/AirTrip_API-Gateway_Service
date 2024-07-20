@@ -1,15 +1,18 @@
 const { InternalServerError, BadRequestError, NotFoundError } = require('../errors/index');
 const { Logger } = require('../config/index');
-const { Auth } = require('../utils/index');
+const { Auth, Enums } = require('../utils/index');
 
 class UserService {
-    constructor(userRepository) {
+    constructor(userRepository, roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     async signupUser(data) {
         try {
             const user = await this.userRepository.create(data);
+            const role = await this.roleRepository.getRolebyName(Enums.USER_ROLES.CUSTOMER);
+            user.addRole(role);
             return user;
         } catch (error) {
             if(error.name === "SequelizeValidationError") {

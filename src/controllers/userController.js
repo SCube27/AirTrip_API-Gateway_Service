@@ -1,9 +1,9 @@
 const { StatusCodes } = require('http-status-codes');
 
-const { UserRepository } = require('../repositories/index');
+const { UserRepository, RoleRepository } = require('../repositories/index');
 const { UserService } = require('../services/index');
 
-const userService = new UserService(new UserRepository());
+const userService = new UserService(new UserRepository(), new RoleRepository());
 
 async function signUp(req, res, next) {
     try {

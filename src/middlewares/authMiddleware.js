@@ -3,9 +3,9 @@ const { StatusCodes } = require('http-status-codes');
 const { Logger } = require('../config/index');
 const { BadRequestError } = require('../errors/index');
 const { UserService } = require('../services/index');
-const { UserRepository } = require('../repositories/index');
+const { UserRepository, RoleRepository } = require('../repositories/index');
 
-const userService = new UserService(new UserRepository());
+const userService = new UserService(new UserRepository(), new RoleRepository());
 
 function validateAuthRequest(req, res, next) {
     if(!req.body.username) {
